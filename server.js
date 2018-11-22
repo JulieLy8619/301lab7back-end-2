@@ -16,12 +16,14 @@ app.use(cors());
 
 // API Routes
 app.get('/location', (request, response) => {
-  searchToLatLong(request.query.data) //the clients input that is given to the proxy to talk to the API.
-    .then(location => response.send(location)) //awaits response from superagent before responding to client 
-    .catch(error => handleError(error, response)); //is there is an error it will call this function which return the error message
+  searchToLatLong(request.query.data)
+    .then(location => response.send(location))
+    .catch(error => handleError(error, response));
 })
 
 app.get('/weather', getWeather);
+
+app.get('/yelp', getYelp);
 
 app.get('/movies', getMovies);
 
@@ -46,6 +48,16 @@ function Weather(day) {
   this.forecast = day.summary;
   this.time = new Date(day.time * 1000).toString().slice(0, 15);
 }
+
+function Food(place) {
+  this.url = place.business.url;
+  this.name = place.business.name;
+  this.rating = place.business.rating; 
+  this.price = place.business.price;
+  // this.image_url = place.business.;
+}
+
+
 
 function Movie(query) {
   this.title = query.title;
@@ -83,13 +95,25 @@ function getWeather(request, response) {
     .catch(error => handleError(error, response));
 }
 
+function getYelp(req, res){
+  const yelpUrl = `https://api.yelp.com/v3/businesses/search?latitude=${req.query.data.latitude}&longitude=${req.query.data.longitude}`;
+
+  superagent.get(yelpUrl)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+    .then(yelpResult => {
+      const yelpSummaries = yelpResult.map(place => {
+        return new Food(place);
+      });
+      res.send(yelpSummaries);
+    })
+    .catch(error => handleError(error, res));
+}
+
 function getMovies(query,response) {
   const movieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${query}`;
-  //hint request.query.data.search_query
 
   superagent.get(movieUrl)
     .then(resultFromSuper => {
-      // console.log('result', resultFromSuper.body.results)
       const movieSummaries = resultFromSuper.body.results.map(movieItem => {
         return new Movie(movieItem);
       });

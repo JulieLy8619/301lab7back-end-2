@@ -3,7 +3,7 @@
 made my own repo so no merge conflicts etc
 herou deployed link (my own and seperate from Adam): https://cf301lab7julies.herokuapp.com/
 note for self: link: https://codefellows.github.io/city_explorer/
-
+Reminder for self feature 1 was already done for us.
 ---------------------------
 Number and name of feature: Feature #3: Retrieve movie information
 -NOTE: this is time tracking after lab time
@@ -13,11 +13,14 @@ Start time: 7:00
 Finish time: 8:00
 Actual time needed to complete: 1hr
 ---------------------------
-Number and name of feature: 
-Estimate of time needed to complete: 
+Number and name of feature: Feature #2: Retrieve restaurant information
+Estimate of time needed to complete: 4 hrs
 date: 11-21-18
+Start time:8:45 
+Finish time:
+date: 11-22-18 
 Start time: 
-Finish time: 
+Finish time:
 Actual time needed to complete: 
 
 
