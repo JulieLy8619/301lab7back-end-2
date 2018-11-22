@@ -1,6 +1,28 @@
 # 301lab7back-end-2
 
 made my own repo so no merge conflicts etc
+herou deployed link (my own and seperate from Adam): https://cf301lab7julies.herokuapp.com/
+note for self: link: https://codefellows.github.io/city_explorer/
+
+---------------------------
+Number and name of feature: Feature #3: Retrieve movie information
+-NOTE: this is time tracking after lab time
+Estimate of time needed to complete: 3hr
+date: 11-21-18
+Start time: 7:00
+Finish time: 8:00
+Actual time needed to complete: 1hr
+---------------------------
+Number and name of feature: 
+Estimate of time needed to complete: 
+date: 11-21-18
+Start time: 
+Finish time: 
+Actual time needed to complete: 
+
+
+
+
 
 Lab 07: APIs (continued)
 Resources
