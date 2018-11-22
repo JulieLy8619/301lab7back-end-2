@@ -55,6 +55,7 @@ function Food(place) {
   this.rating = place.business.rating; 
   this.price = place.business.price;
   // this.image_url = place.business.;
+  // console.log(this);
 }
 
 
@@ -67,7 +68,7 @@ function Movie(query) {
   this.popularity = query.popularity;
   this.image_url = ('http://image.tmdb.org/t/p/w185/'+query.poster_path);
   this.overview = query.overview;
-  console.log(this);
+  // console.log(this);
 }
 
 
@@ -97,6 +98,7 @@ function getWeather(request, response) {
 
 function getYelp(req, res){
   const yelpUrl = `https://api.yelp.com/v3/businesses/search?latitude=${req.query.data.latitude}&longitude=${req.query.data.longitude}`;
+  //https://api.yelp.com/v3/businesses/search?&latitude=37.786882&longitude=-122.399972
 
   superagent.get(yelpUrl)
     .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
