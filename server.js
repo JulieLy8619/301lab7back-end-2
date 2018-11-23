@@ -50,12 +50,12 @@ function Weather(day) {
 }
 
 function Food(place) {
-  this.url = place.business.url;
-  this.name = place.business.name;
-  this.rating = place.business.rating; 
-  this.price = place.business.price;
+  this.url = place.url;
+  this.name = place.name;
+  this.rating = place.rating; 
+  this.price = place.price;
   // this.image_url = place.business.;
-  // console.log(this);
+  console.log(this);
 }
 
 
@@ -97,13 +97,14 @@ function getWeather(request, response) {
 }
 
 function getYelp(req, res){
+  // console.log('req.query.data.latitude', req.query.data.latitude);
   const yelpUrl = `https://api.yelp.com/v3/businesses/search?latitude=${req.query.data.latitude}&longitude=${req.query.data.longitude}`;
-  //https://api.yelp.com/v3/businesses/search?&latitude=37.786882&longitude=-122.399972
 
   superagent.get(yelpUrl)
     .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
     .then(yelpResult => {
-      const yelpSummaries = yelpResult.map(place => {
+      // console.log('yelpResult', yelpResult.body.businesses[0].name);
+      const yelpSummaries = yelpResult.body.businesses.map(place => {
         return new Food(place);
       });
       res.send(yelpSummaries);
@@ -129,3 +130,27 @@ function getMovies(query,response) {
 //  will use superagent.set after superagent.get
 //  the api key isn't used in the URL
 
+// { businesses:
+//   [ 
+//     { id: '6I28wDuMBR5WLMqfKxaoeg',
+//       alias: 'pike-place-chowder-seattle',
+//       name: 'Pike Place Chowder',
+//       image_url:
+//        'https://s3-media3.fl.yelpcdn.com/bphoto/ijju-wYoRAxWjHPTCxyQGQ/o.jpg',
+//       is_closed: false,
+//       url:
+//        'https://www.yelp.com/biz/pike-place-chowder-seattle?adjust_creative=QailHQ2lZirdKKJTGc9X1Q&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=QailHQ2lZirdKKJTGc9X1Q',
+//       review_count: 6321,
+//       categories: [Array],
+//       rating: 4.5,
+//       coordinates: [Object],
+//       transactions: [Array],
+//       price: '$$',
+//       location: [Object],
+//       phone: '+12062672537',
+//       display_phone: '(206) 267-2537',
+//       distance: 767.5659881806488 
+//     }
+//   ]
+// }
+    
