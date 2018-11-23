@@ -2,9 +2,9 @@
 
 
 // Application Dependencies
-const express = require('express'); //telling app to use the express library
-const superagent = require('superagent');  //telling app to use the superagent proxy
-const cors = require('cors');  //telling app to use the CORS library
+const express = require('express');
+const superagent = require('superagent');
+const cors = require('cors');
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -16,22 +16,16 @@ app.use(cors());
 
 // API Routes
 app.get('/location', (request, response) => {
-  searchToLatLong(request.query.data) //the clients input that is given to the proxy to talk to the API.
-    .then(location => response.send(location)) //awaits response from superagent before responding to client 
-    .catch(error => handleError(error, response)); //is there is an error it will call this function which return the error message
+  searchToLatLong(request.query.data)
+    .then(location => response.send(location))
+    .catch(error => handleError(error, response));
 })
 
 app.get('/weather', getWeather);
 
-// app.get('/movies', (request, response) => {
-//   getMovies(request.query.data)
-//     .then(res => {
-//       console.log('getMOvies', res);
-//       response.send(res);
-//     })
-//     .catch(error => handleError(error, response));
-// });
-//which once we re-write getMovies to be like Get weather, then this can all go away and be like getWeather.
+app.get('/yelp', getYelp);
+
+app.get('/movies', getMovies);
 
 // Make sure the server is listening for requests
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -42,12 +36,12 @@ function handleError(err, res) {
   if (res) res.status(500).send('Sorry, something went wrong');
 }
 
-// Models
+// Models (aka constructors)
 function Location(query, res) {
-  this.search_query = query;  //query is coming from superagent, which comes from searchToLatLong, coming from searchToLatLong(the user input): user inputs location which goes into searchToLatLong as a perameter which creates the obj.  
-  this.formatted_query = res.body.results[0].formatted_address; //the res. is the data returned from superagent from the API.
-  this.latitude = res.body.results[0].geometry.location.lat;//the res. is the data returned from superagent from the API.
-  this.longitude = res.body.results[0].geometry.location.lng;//the res. is the data returned from superagent from the API.
+  this.search_query = query;  
+  this.formatted_query = res.body.results[0].formatted_address; 
+  this.latitude = res.body.results[0].geometry.location.lat;
+  this.longitude = res.body.results[0].geometry.location.lng;
 }
 
 function Weather(day) {
@@ -55,16 +49,24 @@ function Weather(day) {
   this.time = new Date(day.time * 1000).toString().slice(0, 15);
 }
 
-// function Movie(query, res) {
-//   this.title = res.title;
-//   this.released_on = res.release_date; 
-//   this.total_votes = res.vote_count;
-//   this.average_votes = res.vote_average;
-//   this.popularity = res.popularity;
-//   this.image_url = res.poster_path;
-//   this.overview = res.overview;
-//   console.log(this);
-// }
+function Food(place) {
+  this.url = place.url;
+  this.name = place.name;
+  this.rating = place.rating; 
+  this.price = place.price;
+  this.image_url = place.image_url;
+  console.log(this);
+}
+
+function Movie(query) {
+  this.title = query.title;
+  this.released_on = query.release_date;
+  this.total_votes = query.vote_count;
+  this.average_votes = query.vote_average;
+  this.popularity = query.popularity;
+  this.image_url = ('http://image.tmdb.org/t/p/w185/'+query.poster_path);
+  this.overview = query.overview;
+}
 
 
 // Helper Functions
@@ -91,25 +93,60 @@ function getWeather(request, response) {
     .catch(error => handleError(error, response));
 }
 
-// function getMovies(query) {
-//   const movieUrl = `https://api.themoviedb.org/3/movie/76341?api_key=${process.env.MOVIE_API_KEY}`;
-//   //QUESTION: should we beware this address didn't ask for a location
-//   //because it isn't movies playing around your queried location, it is movies filmed in/by location
-//   //need to change URL to search with city, see slack
-//   //which will return an array of movies so then we will need to re-write this like the getWeather instead
-//   //hint request.query.data.search_query
+function getYelp(req, res){
+  const yelpUrl = `https://api.yelp.com/v3/businesses/search?latitude=${req.query.data.latitude}&longitude=${req.query.data.longitude}`;
 
-//   superagent.get(movieUrl)
-//     .then( (result) => {
-//       console.log(query);
-//       console.log('resBod', result.body)
-//       return new Movie(query, result.body);
-//     })
-//     .catch(error => handleError(error));
-// }
+  superagent.get(yelpUrl)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+    .then(yelpResult => {
+      console.log('yelpResult', yelpResult.body.businesses[0]);
+      const yelpSummaries = yelpResult.body.businesses.map(place => {
+        return new Food(place);
+      });
+      res.send(yelpSummaries);
+    })
+    .catch(error => handleError(error, res));
+}
+
+function getMovies(query,response) {
+  const movieUrl = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${query}`;
+
+  superagent.get(movieUrl)
+    .then(resultFromSuper => {
+      const movieSummaries = resultFromSuper.body.results.map(movieItem => {
+        return new Movie(movieItem);
+      });
+      response.send(movieSummaries);
+    })
+    .catch(error => handleError(error, response));
+}
 
 //hint for yelp
 //  look at superagent docs
 //  will use superagent.set after superagent.get
 //  the api key isn't used in the URL
 
+// { businesses:
+//   [ 
+//     { id: '6I28wDuMBR5WLMqfKxaoeg',
+//       alias: 'pike-place-chowder-seattle',
+//       name: 'Pike Place Chowder',
+//       image_url:
+//        'https://s3-media3.fl.yelpcdn.com/bphoto/ijju-wYoRAxWjHPTCxyQGQ/o.jpg',
+//       is_closed: false,
+//       url:
+//        'https://www.yelp.com/biz/pike-place-chowder-seattle?adjust_creative=QailHQ2lZirdKKJTGc9X1Q&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=QailHQ2lZirdKKJTGc9X1Q',
+//       review_count: 6321,
+//       categories: [Array],
+//       rating: 4.5,
+//       coordinates: [Object],
+//       transactions: [Array],
+//       price: '$$',
+//       location: [Object],
+//       phone: '+12062672537',
+//       display_phone: '(206) 267-2537',
+//       distance: 767.5659881806488 
+//     }
+//   ]
+// }
+    
