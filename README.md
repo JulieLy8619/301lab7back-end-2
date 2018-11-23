@@ -16,12 +16,15 @@ Actual time needed to complete: 1hr
 Number and name of feature: Feature #2: Retrieve restaurant information
 Estimate of time needed to complete: 4 hrs
 date: 11-21-18
-Start time:8:45 
-Finish time:
+Start time: 8:00 pm
+Finish time: 9:45
 date: 11-22-18 
-Start time: 
-Finish time:
-Actual time needed to complete: 
+Start time: 10:45 pm
+Finish time: 11:30
+Date: 11-23-18
+Start time: 12:30 
+End time: 12:45
+Actual time needed to complete: = 2.75 hours
 
 
 

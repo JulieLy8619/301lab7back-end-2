@@ -2,9 +2,9 @@
 
 
 // Application Dependencies
-const express = require('express'); //telling app to use the express library
-const superagent = require('superagent');  //telling app to use the superagent proxy
-const cors = require('cors');  //telling app to use the CORS library
+const express = require('express');
+const superagent = require('superagent');
+const cors = require('cors');
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -36,7 +36,7 @@ function handleError(err, res) {
   if (res) res.status(500).send('Sorry, something went wrong');
 }
 
-// Models
+// Models (aka constructors)
 function Location(query, res) {
   this.search_query = query;  
   this.formatted_query = res.body.results[0].formatted_address; 
@@ -54,11 +54,9 @@ function Food(place) {
   this.name = place.name;
   this.rating = place.rating; 
   this.price = place.price;
-  // this.image_url = place.business.;
+  this.image_url = place.image_url;
   console.log(this);
 }
-
-
 
 function Movie(query) {
   this.title = query.title;
@@ -68,7 +66,6 @@ function Movie(query) {
   this.popularity = query.popularity;
   this.image_url = ('http://image.tmdb.org/t/p/w185/'+query.poster_path);
   this.overview = query.overview;
-  // console.log(this);
 }
 
 
@@ -97,13 +94,12 @@ function getWeather(request, response) {
 }
 
 function getYelp(req, res){
-  // console.log('req.query.data.latitude', req.query.data.latitude);
   const yelpUrl = `https://api.yelp.com/v3/businesses/search?latitude=${req.query.data.latitude}&longitude=${req.query.data.longitude}`;
 
   superagent.get(yelpUrl)
     .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
     .then(yelpResult => {
-      // console.log('yelpResult', yelpResult.body.businesses[0].name);
+      console.log('yelpResult', yelpResult.body.businesses[0]);
       const yelpSummaries = yelpResult.body.businesses.map(place => {
         return new Food(place);
       });
